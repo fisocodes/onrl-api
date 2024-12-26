@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"description": "REST API for Open NRL project",
 	"main": "index.js",
+	"type": "module",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/fisocodes/onrl-api.git"
@@ -24,6 +25,8 @@
 	},
 	"homepage": "https://github.com/fisocodes/onrl-api#readme",
 	"devDependencies": {
+		"@commitlint/cli": "19.6.1",
+		"@commitlint/config-conventional": "19.6.0",
 		"husky": "9.1.7"
 	},
 	"scripts": {
