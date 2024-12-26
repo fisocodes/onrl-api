@@ -1,0 +1,26 @@
+{
+	"name": "onrl-api",
+	"version": "0.1.0",
+	"description": "REST API for Open NRL project",
+	"main": "index.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/fisocodes/onrl-api.git"
+	},
+	"keywords": [
+		"ONRL",
+		"open",
+		"NRL",
+		"national",
+		"rugby",
+		"league",
+		"API",
+		"REST"
+	],
+	"author": "fisocodes",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/fisocodes/onrl-api/issues"
+	},
+	"homepage": "https://github.com/fisocodes/onrl-api#readme"
+}
