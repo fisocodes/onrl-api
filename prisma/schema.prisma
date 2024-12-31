@@ -54,6 +54,10 @@ model User {
   updatedMatches Match[] @relation("updated_matches")
   deletedMatches Match[] @relation("deleted_matches")
 
+  createdMatchScores MatchScore[] @relation("created_match_scores")
+  updatedMatchScores MatchScore[] @relation("updated_match_scores")
+  deletedMatchScores MatchScore[] @relation("deleted_match_scores")
+
   createdVenues Venue[] @relation("created_venues")
   updatedVenues Venue[] @relation("updated_venues")
   deletedVenues Venue[] @relation("deleted_venues")
@@ -78,7 +82,6 @@ model Competition {
   deleter User @relation(name: "deleted_competitions", fields: [updaterId], references: [id])
 
   name String @unique
-  seasons Season[]
 
 }
 
@@ -101,9 +104,6 @@ model Season {
   deleter User @relation(name: "deleted_seasons", fields: [updaterId], references: [id])
 
   year Int @unique
-  rounds Round[]
-
-  competitions Competition[]
 
 }
 
@@ -125,11 +125,8 @@ model Round {
   deleterId Int
   deleter User @relation(name: "deleted_rounds", fields: [updaterId], references: [id])
 
-  seasonId Int
-  seasons Season[]
+  number Int @unique
 
-  number Int
-  matches Match[]
 }
 
 model Match {
@@ -150,12 +147,27 @@ model Match {
   deleterId Int
   deleter User @relation(name: "deleted_matches", fields: [updaterId], references: [id])
 
-  teams Team[]
+  date DateTime
 
-  roundId Int
-  round Round @relation(fields: [roundId], references: [id])
-  venueId Int
-  venue Venue @relation(fields: [venueId], references: [id])
+}
+
+model MatchScore {
+
+  @@map("match_scores")
+
+  id Int @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  createDate DateTime @default(now()) @map("create_date")
+  updateDate DateTime @updatedAt @map("update_date")
+  deleteDate DateTime? @map("delete_date")
+
+  creatorId Int
+  creator User @relation(name: "created_match_scores", fields: [creatorId], references: [id])
+  updaterId Int
+  updater User @relation(name: "updated_match_scores", fields: [updaterId], references: [id])
+  deleterId Int
+  deleter User @relation(name: "deleted_match_scores", fields: [updaterId], references: [id])
 
 }
 
@@ -176,17 +188,6 @@ model Team {
   updater User @relation(name: "updated_teams", fields: [updaterId], references: [id])
   deleterId Int
   deleter User @relation(name: "deleted_teams", fields: [updaterId], references: [id])
-
-  date DateTime
-  isHome Boolean
-
-  clubId Int
-  club Club @relation(fields: [clubId], references: [id])
-
-  playerPositions PlayerPosition[]
-
-  matchId Int
-  match Match @relation(fields: [matchId], references: [id])
   
 }
 
@@ -208,7 +209,6 @@ model Club {
   deleterId Int
   deleter User @relation(name: "deleted_clubs", fields: [updaterId], references: [id])
   
-  teams Team[]
 }
 
 model Player {
@@ -229,7 +229,6 @@ model Player {
   deleterId Int
   deleter User @relation(name: "deleted_players", fields: [updaterId], references: [id])
 
-  positions PlayerPosition[]
 }
 
 model PlayerPosition {
@@ -252,12 +251,6 @@ model PlayerPosition {
 
   number Int @unique
   name String @unique
-
-  playerId Int
-  player Player @relation(fields: [playerId], references: [id])
-
-  teamId Int
-  team Team @relation(fields: [teamId], references: [id])
 }
 
 model Venue {
@@ -277,7 +270,5 @@ model Venue {
   updater User @relation(name: "updated_venues", fields: [updaterId], references: [id])
   deleterId Int
   deleter User @relation(name: "deleted_venues", fields: [updaterId], references: [id])
-
-  matches Match[]
 
 }
