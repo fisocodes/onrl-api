@@ -149,6 +149,8 @@ model Match {
 
   date DateTime
 
+  debutedPlayers Player[] @relation(name: "debut_match")
+
 }
 
 model MatchScore {
@@ -168,6 +170,8 @@ model MatchScore {
   updater User @relation(name: "updated_match_scores", fields: [updaterId], references: [id])
   deleterId Int
   deleter User @relation(name: "deleted_match_scores", fields: [updaterId], references: [id])
+
+  score Int
 
 }
 
@@ -208,6 +212,8 @@ model Club {
   updater User @relation(name: "updated_clubs", fields: [updaterId], references: [id])
   deleterId Int
   deleter User @relation(name: "deleted_clubs", fields: [updaterId], references: [id])
+
+  name String @unique
   
 }
 
@@ -228,6 +234,16 @@ model Player {
   updater User @relation(name: "updated_players", fields: [updaterId], references: [id])
   deleterId Int
   deleter User @relation(name: "deleted_players", fields: [updaterId], references: [id])
+
+  name String
+  surname String
+  dob DateTime
+  height Int
+  weight Int
+  birthplace String
+  
+  debutMatchId Int
+  debutMatch Match @relation(name: "debut_match", fields: [debutMatchId], references: [id])
 
 }
 
