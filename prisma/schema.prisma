@@ -7,284 +7,92 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Profile {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
 
-  @@map("users")
-    
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  username String @unique
-  email String @unique
-  passwordHash String
-
-  createdCompetitions Competition[] @relation("created_competitions")
-  updatedCompetitions Competition[] @relation("updated_competitions")
-  deletedCompetitions Competition[] @relation("deleted_competitions")
-
-  createdSeasons Season[] @relation("created_seasons")
-  updatedSeasons Season[] @relation("updated_seasons")
-  deletedSeasons Season[] @relation("deleted_seasons")
-
-  createdRounds Round[] @relation("created_rounds")
-  updatedRounds Round[] @relation("updated_rounds")
-  deletedRounds Round[] @relation("deleted_rounds")
-
-  createdClubs Club[] @relation("created_clubs")
-  updatedClubs Club[] @relation("updated_clubs")
-  deletedClubs Club[] @relation("deleted_clubs")
-
-  createdPlayers Player[] @relation("created_players")
-  updatedPlayers Player[] @relation("updated_players")
-  deletedPlayers Player[] @relation("deleted_players")
-
-  createdPlayerPositions TeamPosition[] @relation("created_team_positions")
-  updatedPlayerPositions TeamPosition[] @relation("updated_team_positions")
-  deletedPlayerPositions TeamPosition[] @relation("deleted_team_positions")
-
-  createdTeams Team[] @relation("created_teams")
-  updatedTeams Team[] @relation("updated_teams")
-  deletedTeams Team[] @relation("deleted_teams")
-
-  createdMatches Match[] @relation("created_matches")
-  updatedMatches Match[] @relation("updated_matches")
-  deletedMatches Match[] @relation("deleted_matches")
-
-  createdMatchScores MatchScore[] @relation("created_match_scores")
-  updatedMatchScores MatchScore[] @relation("updated_match_scores")
-  deletedMatchScores MatchScore[] @relation("deleted_match_scores")
-
-  createdVenues Venue[] @relation("created_venues")
-  updatedVenues Venue[] @relation("updated_venues")
-  deletedVenues Venue[] @relation("deleted_venues")
-}
-
-model Competition {
-
-  @@map("competitions")
-
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  creatorId Int
-  creator User @relation(name: "created_competitions", fields: [creatorId], references: [id])
-  updaterId Int
-  updater User @relation(name: "updated_competitions", fields: [updaterId], references: [id])
-  deleterId Int
-  deleter User @relation(name: "deleted_competitions", fields: [updaterId], references: [id])
-
-  name String @unique
-
-}
-
-model Season {
-
-  @@map("seasons")
-
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  creatorId Int
-  creator User @relation(name: "created_seasons", fields: [creatorId], references: [id])
-  updaterId Int
-  updater User @relation(name: "updated_seasons", fields: [updaterId], references: [id])
-  deleterId Int
-  deleter User @relation(name: "deleted_seasons", fields: [updaterId], references: [id])
-
-  year Int @unique
-
-}
-
-model Round {
-
-  @@map("rounds")
-
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  creatorId Int
-  creator User @relation(name: "created_rounds", fields: [creatorId], references: [id])
-  updaterId Int
-  updater User @relation(name: "updated_rounds", fields: [updaterId], references: [id])
-  deleterId Int
-  deleter User @relation(name: "deleted_rounds", fields: [updaterId], references: [id])
-
-  number Int @unique
-
-}
-
-model Match {
-
-  @@map("matches")
-
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  creatorId Int
-  creator User @relation(name: "created_matches", fields: [creatorId], references: [id])
-  updaterId Int
-  updater User @relation(name: "updated_matches", fields: [updaterId], references: [id])
-  deleterId Int
-  deleter User @relation(name: "deleted_matches", fields: [updaterId], references: [id])
-
-  date DateTime
-
-  debutedPlayers Player[] @relation(name: "debut_match")
-
-}
-
-model MatchScore {
-
-  @@map("match_scores")
-
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  creatorId Int
-  creator User @relation(name: "created_match_scores", fields: [creatorId], references: [id])
-  updaterId Int
-  updater User @relation(name: "updated_match_scores", fields: [updaterId], references: [id])
-  deleterId Int
-  deleter User @relation(name: "deleted_match_scores", fields: [updaterId], references: [id])
-
-  score Int
-
-}
-
-model Team {
-  
-  @@map("teams")
-    
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  creatorId Int
-  creator User @relation(name: "created_teams", fields: [creatorId], references: [id])
-  updaterId Int
-  updater User @relation(name: "updated_teams", fields: [updaterId], references: [id])
-  deleterId Int
-  deleter User @relation(name: "deleted_teams", fields: [updaterId], references: [id])
-  
-}
-
-model Club {
-
-  @@map("clubs")
-
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  creatorId Int
-  creator User @relation(name: "created_clubs", fields: [creatorId], references: [id])
-  updaterId Int
-  updater User @relation(name: "updated_clubs", fields: [updaterId], references: [id])
-  deleterId Int
-  deleter User @relation(name: "deleted_clubs", fields: [updaterId], references: [id])
-
-  name String @unique
-  
+  player Player?
+  official Official?
+  coach Coach?
 }
 
 model Player {
-
-  @@map("players")
-
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  creatorId Int
-  creator User @relation(name: "created_players", fields: [creatorId], references: [id])
-  updaterId Int
-  updater User @relation(name: "updated_players", fields: [updaterId], references: [id])
-  deleterId Int
-  deleter User @relation(name: "deleted_players", fields: [updaterId], references: [id])
-
-  name String
-  surname String
-  dob DateTime
-  height Int
-  weight Int
-  birthplace String
+  id String @id @default(uuid())
   
-  debutMatchId Int
-  debutMatch Match @relation(name: "debut_match", fields: [debutMatchId], references: [id])
-
+  profile Profile @relation(fields: [profileId], references: [id])
+  profileId String @unique
 }
 
-model TeamPosition {
-
-  @@map("team_positions")
-
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  creatorId Int
-  creator User @relation(name: "created_team_positions", fields: [creatorId], references: [id])
-  updaterId Int
-  updater User @relation(name: "updated_team_positions", fields: [updaterId], references: [id])
-  deleterId Int
-  deleter User @relation(name: "deleted_team_positions", fields: [updaterId], references: [id])
-
+model PlayerPosition {
+  id String @id @default(uuid())
   number Int @unique
+  name String
+  description String
+
+  assignments PlayerAssignment[]
+}
+
+model PlayerAssignment {
+  id String @id @default(uuid())
+
+  team Team @relation(fields: [teamId], references: [id])
+  teamId String
+
+  playerPosition PlayerPosition @relation(fields: [playerPositionId], references: [id])
+  playerPositionId String
+}
+
+model Official {
+  id String @id @default(uuid())
+
+  profile Profile @relation(fields: [profileId], references: [id])
+  profileId String @unique
+
+  assignments OfficialAssignment[]
+}
+
+model OfficialRole {
+  id String @id @default(uuid())
+  name String @unique
+  description String
+
+  assignments OfficialAssignment[]
+}
+model OfficialAssignment {
+  id String @id @default(uuid())
+
+  match Match @relation(fields: [matchId], references: [id])
+  matchId String
+
+  official Official @relation(fields: [officialId], references: [id])
+  officialId String
+
+  role OfficialRole @relation(fields: [roleId], references: [id])
+  roleId String
+}
+
+model Coach {
+  id String @id @default(uuid())
+
+  profile Profile @relation(fields: [profileId], references: [id])
+  profileId String @unique
+}
+
+model Club {
+  id String @id @default(uuid())
+
   name String @unique
 }
 
-model Venue {
+model Team {
+  id String @id @default(uuid())
 
-  @@map("venues")
+  playerAssignments PlayerAssignment[]
+}
 
-  id Int @id @default(autoincrement())
-  uuid String @unique @default(uuid())
+model Match {
+  id String @id @default(uuid())
 
-  createDate DateTime @default(now()) @map("create_date")
-  updateDate DateTime @updatedAt @map("update_date")
-  deleteDate DateTime? @map("delete_date")
-
-  creatorId Int
-  creator User @relation(name: "created_venues", fields: [creatorId], references: [id])
-  updaterId Int
-  updater User @relation(name: "updated_venues", fields: [updaterId], references: [id])
-  deleterId Int
-  deleter User @relation(name: "deleted_venues", fields: [updaterId], references: [id])
-
+  officialAssignments OfficialAssignment[]
 }
