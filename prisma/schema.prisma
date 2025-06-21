@@ -22,25 +22,60 @@ model Player {
   
   profile Profile @relation(fields: [profileId], references: [id])
   profileId String @unique
+
+  teamAssignments PlayerTeamAssignment[]
+  lineups Lineup[]
 }
 
 model PlayerPosition {
   id String @id @default(uuid())
-  number Int @unique
-  name String
+  name String @unique
   description String
 
-  assignments PlayerAssignment[]
+  teamAssignments PlayerTeamAssignment[]
+  lineups Lineup[]
 }
 
-model PlayerAssignment {
+model PlayerTeamAssignment {
   id String @id @default(uuid())
+
+  player Player @relation(fields: [playerId], references: [id])
+  playerId String
 
   team Team @relation(fields: [teamId], references: [id])
   teamId String
 
   playerPosition PlayerPosition @relation(fields: [playerPositionId], references: [id])
   playerPositionId String
+
+  season Season @relation(fields: [seasonId], references: [id])
+  seasonId String
+
+  @@unique([playerId, seasonId])
+}
+
+model Coach {
+  id String @id @default(uuid())
+
+  profile Profile @relation(fields: [profileId], references: [id])
+  profileId String @unique
+
+  teamAssignments CoachTeamAssignment[]
+}
+
+model CoachTeamAssignment {
+  id String @id @default(uuid())
+
+  coach Coach @relation(fields: [coachId], references: [id])
+  coachId String
+
+  team Team @relation(fields: [teamId], references: [id])
+  teamId String
+
+  season Season @relation(fields: [seasonId], references: [id])
+  seasonId String
+
+  @@unique([coachId, seasonId, teamId])
 }
 
 model Official {
@@ -49,7 +84,7 @@ model Official {
   profile Profile @relation(fields: [profileId], references: [id])
   profileId String @unique
 
-  assignments OfficialAssignment[]
+  assignments OfficialMatchAssignment[]
 }
 
 model OfficialRole {
@@ -57,9 +92,9 @@ model OfficialRole {
   name String @unique
   description String
 
-  assignments OfficialAssignment[]
+  assignments OfficialMatchAssignment[]
 }
-model OfficialAssignment {
+model OfficialMatchAssignment {
   id String @id @default(uuid())
 
   match Match @relation(fields: [matchId], references: [id])
@@ -70,29 +105,155 @@ model OfficialAssignment {
 
   role OfficialRole @relation(fields: [roleId], references: [id])
   roleId String
-}
 
-model Coach {
-  id String @id @default(uuid())
-
-  profile Profile @relation(fields: [profileId], references: [id])
-  profileId String @unique
+  @@unique([officialId, matchId])
 }
 
 model Club {
   id String @id @default(uuid())
 
   name String @unique
+
+  teamAssignments ClubTeamAssignment[]
+}
+
+model ClubTeamAssignment {
+  id String @id @default(uuid())
+
+  club Club @relation(fields: [clubId], references: [id])
+  clubId String
+
+  team Team @relation(fields: [teamId], references: [id])
+  teamId String
+
+  season Season @relation(fields: [seasonId], references: [id])
+  seasonId String
+
+  @@unique([seasonId, teamId])
 }
 
 model Team {
   id String @id @default(uuid())
 
-  playerAssignments PlayerAssignment[]
+  competitionEdition CompetitionEdition @relation(fields: [competitionEditionId], references: [id])
+  competitionEditionId String
+
+  clubAssignments ClubTeamAssignment[]
+  coachAssignments CoachTeamAssignment[]
+  playerAssignments PlayerTeamAssignment[]
+  appearances TeamAppearance[]
+}
+
+model TeamAppearance {
+  id String @id @default(uuid())
+
+  isHome Boolean
+
+  match Match @relation(fields: [matchId], references: [id])
+  matchId String
+
+  team Team @relation(fields: [teamId], references: [id])
+  teamId String
+
+  lineup Lineup[]
 }
 
 model Match {
   id String @id @default(uuid())
 
-  officialAssignments OfficialAssignment[]
+  venueAssignments VenueMatchAssignment[]
+
+  competitionEdition CompetitionEdition @relation(fields: [competitionEditionId], references: [id])
+  competitionEditionId String
+
+  round Round @relation(fields: [roundId], references: [id])
+  roundId String
+
+  officialAssignments OfficialMatchAssignment[]
+  teamAppearances TeamAppearance[]
+}
+
+model Lineup {
+  id String @id @default(uuid())
+
+  teamAppearance TeamAppearance @relation(fields: [teamAppearanceId], references: [id])
+  teamAppearanceId String
+
+  player Player @relation(fields: [playerId], references: [id])
+  playerId String
+
+  position PlayerPosition @relation(fields: [positionId], references: [id])
+  positionId String
+
+  jerseyNumber Int
+
+  @@index([teamAppearanceId, jerseyNumber])
+
+  @@unique([teamAppearanceId, playerId])
+}
+
+model Season {
+  id String @id @default(uuid())
+  year Int @unique
+
+  editions CompetitionEdition[]
+  playerTeamAssignments PlayerTeamAssignment[]
+  coachTeamAssignments CoachTeamAssignment[]
+  clubTeamAssignments ClubTeamAssignment[]
+}
+
+model Competition {
+  id String @id @default(uuid())
+  name String @unique
+
+  editions CompetitionEdition[]
+}
+
+model CompetitionEdition {
+  id String @id @default(uuid())
+
+  competition Competition @relation(fields: [competitionId], references: [id])
+  competitionId String
+
+  season Season @relation(fields: [seasonId], references: [id])
+  seasonId String
+
+  matches Match[]
+  teams Team[]
+  rounds Round[]
+
+  @@unique([competitionId, seasonId])
+}
+
+model Venue {
+  id String @id @default(uuid())
+  name String @unique
+
+  matchAssignments VenueMatchAssignment[]
+}
+
+model VenueMatchAssignment {
+  id String @id @default(uuid())
+
+  venue Venue @relation(fields: [venueId], references: [id])
+  venueId String
+
+  match Match @relation(fields: [matchId], references: [id])
+  matchId String
+}
+
+model Round {
+    id String @id @default(uuid())
+
+    competitionEdition CompetitionEdition @relation(fields: [competitionEditionId], references: [id])
+    competitionEditionId String
+
+    number Int
+    name String?
+
+    type String
+
+    matches Match[]
+
+    @@unique([competitionEditionId, number])
 }
