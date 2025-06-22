@@ -210,6 +210,25 @@ model Team {
   perMatchStatistics TeamPerMatchStatistic[]
 }
 
+model Lineup {
+  id String @id @default(uuid())
+
+  teamMatchAppearance TeamMatchAppearance @relation(fields: [teamMatchAppearanceId], references: [id])
+  teamMatchAppearanceId String
+
+  player Player @relation(fields: [playerId], references: [id])
+  playerId String
+
+  position PlayerPosition @relation(fields: [positionId], references: [id])
+  positionId String
+
+  jerseyNumber Int
+
+  @@index([teamMatchAppearanceId, jerseyNumber])
+
+  @@unique([teamMatchAppearanceId, playerId])
+}
+
 model TeamMatchAppearance {
   id String @id @default(uuid())
 
@@ -284,25 +303,6 @@ model Match {
   playerStatistics PlayerPerMatchStatistic[]
   events MatchEvent[]
   
-}
-
-model Lineup {
-  id String @id @default(uuid())
-
-  teamMatchAppearance TeamMatchAppearance @relation(fields: [teamMatchAppearanceId], references: [id])
-  teamMatchAppearanceId String
-
-  player Player @relation(fields: [playerId], references: [id])
-  playerId String
-
-  position PlayerPosition @relation(fields: [positionId], references: [id])
-  positionId String
-
-  jerseyNumber Int
-
-  @@index([teamMatchAppearanceId, jerseyNumber])
-
-  @@unique([teamMatchAppearanceId, playerId])
 }
 
 model MatchEvent {
