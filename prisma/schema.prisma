@@ -25,7 +25,7 @@ model Player {
 
   teamAssignments PlayerTeamAssignment[]
   lineups Lineup[]
-  matchStatistics PlayerMatchStatistic[]
+  perMatchStatistics PlayerPerMatchStatistic[]
   matchEventParticipations MatchEventParticipation[]
 }
 
@@ -150,7 +150,7 @@ model Team {
   playerAssignments PlayerTeamAssignment[]
   matchAppearances TeamMatchAppearance[]
   matchEvents MatchEvent[]
-  matchStatistics TeamMatchStatistic[]
+  perMatchStatistics TeamPerMatchStatistic[]
 }
 
 model TeamMatchAppearance {
@@ -167,7 +167,7 @@ model TeamMatchAppearance {
   lineup Lineup[]
 }
 
-model TeamMatchStatistic {
+model TeamPerMatchStatistic {
   id String @id @default(uuid())
 
   team Team @relation(fields: [teamId], references: [id])
@@ -176,31 +176,33 @@ model TeamMatchStatistic {
   match Match @relation(fields: [matchId], references: [id])
   matchId String
 
-  statistic TeamStatistic @relation(fields: [statisticId], references: [id])
-  statisticId String
+  type TeamPerMatchStatisticType @relation(fields: [typeId], references: [id])
+  typeId String
 
   value Float
 
-  @@unique([teamId, matchId, statisticId])
+  @@unique([teamId, matchId, typeId])
 }
 
-model TeamStatistic {
+model TeamPerMatchStatisticType {
   id String @id @default(uuid())
 
   name String @unique
+  description String
 
-  category TeamStatisticCategory @relation(fields: [categoryId], references: [id])
+  category TeamPerMatchStatisticCategory @relation(fields: [categoryId], references: [id])
   categoryId String
 
-  teamStatistics TeamMatchStatistic[]
+  teamStatistics TeamPerMatchStatistic[]
 }
 
-model TeamStatisticCategory {
+model TeamPerMatchStatisticCategory {
   id String @id @default(uuid())
 
   name String @unique
+  description String
 
-  statistics TeamStatistic[]
+  statisticTypes TeamPerMatchStatisticType[]
 }
 
 model Match {
@@ -218,8 +220,8 @@ model Match {
   refereeCrewId String
 
   teamAppearances TeamMatchAppearance[]
-  teamStatistics TeamMatchStatistic[]
-  playerStatistics PlayerMatchStatistic[]
+  teamStatistics TeamPerMatchStatistic[]
+  playerStatistics PlayerPerMatchStatistic[]
   events MatchEvent[]
   
 }
@@ -309,7 +311,7 @@ model Round {
     @@unique([competitionEditionId, number])
 }
 
-model PlayerMatchStatistic {
+model PlayerPerMatchStatistic {
     id String @id @default(uuid())
 
     player Player @relation(fields: [playerId], references: [id])
@@ -318,29 +320,31 @@ model PlayerMatchStatistic {
     match Match @relation(fields: [matchId], references: [id])
     matchId String
 
-    statistic PlayerStatistic @relation(fields: [statisticId], references: [id])
-    statisticId String
+    type PlayerPerMatchStatisticType @relation(fields: [typeId], references: [id])
+    typeId String
 
     value Float
 
-    @@unique([playerId, matchId, statisticId])
+    @@unique([playerId, matchId, typeId])
 }
 
-model PlayerStatistic {
+model PlayerPerMatchStatisticType {
     id String @id @default(uuid())
     name String @unique
+    description String
 
-    category PlayerStatisticCategory @relation(fields: [categoryId], references: [id])
+    category PlayerPerMatchStatisticCategory @relation(fields: [categoryId], references: [id])
     categoryId String
 
-    playerStatistics PlayerMatchStatistic[]
+    playerStatistics PlayerPerMatchStatistic[]
 }
 
-model PlayerStatisticCategory {
+model PlayerPerMatchStatisticCategory {
     id String @id @default(uuid())
     name String @unique
+    description String
 
-    statistics PlayerStatistic[]
+    statisticTypes PlayerPerMatchStatisticType[]
 }
 
 model MatchEvent {
@@ -358,6 +362,8 @@ model MatchEvent {
 
     type MatchEventType @relation(fields: [typeId], references: [id])
     typeId String
+
+    @@index([matchId, timestamp])
 }
 
 model MatchEventType {
