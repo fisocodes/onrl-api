@@ -25,6 +25,8 @@ model Player {
 
   teamAssignments PlayerTeamAssignment[]
   lineups Lineup[]
+  matchStatistics PlayerMatchStatistic[]
+  matchEventParticipations MatchEventParticipation[]
 }
 
 model PlayerPosition {
@@ -84,7 +86,7 @@ model Official {
   profile Profile @relation(fields: [profileId], references: [id])
   profileId String @unique
 
-  assignments OfficialMatchAssignment[]
+  assignments RefereeCrewAssignment[]
 }
 
 model OfficialRole {
@@ -92,13 +94,17 @@ model OfficialRole {
   name String @unique
   description String
 
-  assignments OfficialMatchAssignment[]
+  assignments RefereeCrewAssignment[]
 }
-model OfficialMatchAssignment {
+
+model RefereeCrew {
   id String @id @default(uuid())
 
-  match Match @relation(fields: [matchId], references: [id])
-  matchId String
+  assignments RefereeCrewAssignment[]
+  matches Match[]
+}
+model RefereeCrewAssignment {
+  id String @id @default(uuid())
 
   official Official @relation(fields: [officialId], references: [id])
   officialId String
@@ -106,7 +112,8 @@ model OfficialMatchAssignment {
   role OfficialRole @relation(fields: [roleId], references: [id])
   roleId String
 
-  @@unique([officialId, matchId])
+  refereeCrew RefereeCrew @relation(fields: [refereeCrewId], references: [id])
+  refereeCrewId String
 }
 
 model Club {
@@ -141,10 +148,12 @@ model Team {
   clubAssignments ClubTeamAssignment[]
   coachAssignments CoachTeamAssignment[]
   playerAssignments PlayerTeamAssignment[]
-  appearances TeamAppearance[]
+  matchAppearances TeamMatchAppearance[]
+  matchEvents MatchEvent[]
+  matchStatistics TeamMatchStatistic[]
 }
 
-model TeamAppearance {
+model TeamMatchAppearance {
   id String @id @default(uuid())
 
   isHome Boolean
@@ -158,6 +167,42 @@ model TeamAppearance {
   lineup Lineup[]
 }
 
+model TeamMatchStatistic {
+  id String @id @default(uuid())
+
+  team Team @relation(fields: [teamId], references: [id])
+  teamId String
+
+  match Match @relation(fields: [matchId], references: [id])
+  matchId String
+
+  statistic TeamStatistic @relation(fields: [statisticId], references: [id])
+  statisticId String
+
+  value Float
+
+  @@unique([teamId, matchId, statisticId])
+}
+
+model TeamStatistic {
+  id String @id @default(uuid())
+
+  name String @unique
+
+  category TeamStatisticCategory @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  teamStatistics TeamMatchStatistic[]
+}
+
+model TeamStatisticCategory {
+  id String @id @default(uuid())
+
+  name String @unique
+
+  statistics TeamStatistic[]
+}
+
 model Match {
   id String @id @default(uuid())
 
@@ -169,15 +214,21 @@ model Match {
   round Round @relation(fields: [roundId], references: [id])
   roundId String
 
-  officialAssignments OfficialMatchAssignment[]
-  teamAppearances TeamAppearance[]
+  refereeCrew RefereeCrew @relation(fields: [refereeCrewId], references: [id])
+  refereeCrewId String
+
+  teamAppearances TeamMatchAppearance[]
+  teamStatistics TeamMatchStatistic[]
+  playerStatistics PlayerMatchStatistic[]
+  events MatchEvent[]
+  
 }
 
 model Lineup {
   id String @id @default(uuid())
 
-  teamAppearance TeamAppearance @relation(fields: [teamAppearanceId], references: [id])
-  teamAppearanceId String
+  teamMatchAppearance TeamMatchAppearance @relation(fields: [teamMatchAppearanceId], references: [id])
+  teamMatchAppearanceId String
 
   player Player @relation(fields: [playerId], references: [id])
   playerId String
@@ -187,9 +238,9 @@ model Lineup {
 
   jerseyNumber Int
 
-  @@index([teamAppearanceId, jerseyNumber])
+  @@index([teamMatchAppearanceId, jerseyNumber])
 
-  @@unique([teamAppearanceId, playerId])
+  @@unique([teamMatchAppearanceId, playerId])
 }
 
 model Season {
@@ -256,4 +307,87 @@ model Round {
     matches Match[]
 
     @@unique([competitionEditionId, number])
+}
+
+model PlayerMatchStatistic {
+    id String @id @default(uuid())
+
+    player Player @relation(fields: [playerId], references: [id])
+    playerId String
+
+    match Match @relation(fields: [matchId], references: [id])
+    matchId String
+
+    statistic PlayerStatistic @relation(fields: [statisticId], references: [id])
+    statisticId String
+
+    value Float
+
+    @@unique([playerId, matchId, statisticId])
+}
+
+model PlayerStatistic {
+    id String @id @default(uuid())
+    name String @unique
+
+    category PlayerStatisticCategory @relation(fields: [categoryId], references: [id])
+    categoryId String
+
+    playerStatistics PlayerMatchStatistic[]
+}
+
+model PlayerStatisticCategory {
+    id String @id @default(uuid())
+    name String @unique
+
+    statistics PlayerStatistic[]
+}
+
+model MatchEvent {
+    id String @id @default(uuid())
+    
+    match Match @relation(fields: [matchId], references: [id])
+    matchId String
+
+    team Team @relation(fields: [teamId], references: [id])
+    teamId String
+
+    participations MatchEventParticipation[]
+
+    timestamp Int
+
+    type MatchEventType @relation(fields: [typeId], references: [id])
+    typeId String
+}
+
+model MatchEventType {
+    id String @id @default(uuid())
+
+    name String @unique
+    description String
+
+    events MatchEvent[]
+}
+
+model MatchEventParticipation {
+  id String @id @default(uuid())
+
+  event MatchEvent @relation(fields: [eventId], references: [id])
+  eventId String
+
+  player Player @relation(fields: [playerId], references: [id])
+  playerId String
+
+  role MatchEventParticipationRole @relation(fields: [roleId], references: [id])
+  roleId String
+
+  @@unique([eventId, playerId])
+}
+
+model MatchEventParticipationRole {
+  id String @id @default(uuid())
+  name String @unique
+  description String
+
+  participations MatchEventParticipation[]
 }
