@@ -17,6 +17,7 @@ model Profile {
   coach Coach?
 }
 
+// PLAYER DOMAIN
 model Player {
   id String @id @default(uuid())
   
@@ -56,6 +57,47 @@ model PlayerTeamAssignment {
   @@unique([playerId, seasonId])
 }
 
+model PlayerPerMatchStatistic {
+    id String @id @default(uuid())
+
+    player Player @relation(fields: [playerId], references: [id])
+    playerId String
+
+    match Match @relation(fields: [matchId], references: [id])
+    matchId String
+
+    type PlayerPerMatchStatisticType @relation(fields: [typeId], references: [id])
+    typeId String
+
+    value Float
+
+    @@unique([playerId, matchId, typeId])
+}
+
+model PlayerPerMatchStatisticType {
+    id String @id @default(uuid())
+    name String @unique
+    description String
+
+    category PlayerPerMatchStatisticCategory @relation(fields: [categoryId], references: [id])
+    categoryId String
+
+    playerStatistics PlayerPerMatchStatistic[]
+}
+
+model PlayerPerMatchStatisticCategory {
+    id String @id @default(uuid())
+    name String @unique
+    description String
+
+    statisticTypes PlayerPerMatchStatisticType[]
+}
+
+// PLAYER DOMAIN
+
+
+// COACH DOMAIN
+
 model Coach {
   id String @id @default(uuid())
 
@@ -79,6 +121,11 @@ model CoachTeamAssignment {
 
   @@unique([coachId, seasonId, teamId])
 }
+
+// COACH DOMAIN
+
+
+// REFEREE DOMAIN
 
 model Official {
   id String @id @default(uuid())
@@ -116,6 +163,11 @@ model RefereeCrewAssignment {
   refereeCrewId String
 }
 
+// REFEREE DOMAIN
+
+
+//CLUB DOMAIN
+
 model Club {
   id String @id @default(uuid())
 
@@ -138,6 +190,11 @@ model ClubTeamAssignment {
 
   @@unique([seasonId, teamId])
 }
+
+// CLUB DOMAIN
+
+
+// TEAM DOMAIN
 
 model Team {
   id String @id @default(uuid())
@@ -205,6 +262,9 @@ model TeamPerMatchStatisticCategory {
   statisticTypes TeamPerMatchStatisticType[]
 }
 
+// TEAM DOMAIN
+
+//MATCH DOMAIN
 model Match {
   id String @id @default(uuid())
 
@@ -243,108 +303,6 @@ model Lineup {
   @@index([teamMatchAppearanceId, jerseyNumber])
 
   @@unique([teamMatchAppearanceId, playerId])
-}
-
-model Season {
-  id String @id @default(uuid())
-  year Int @unique
-
-  editions CompetitionEdition[]
-  playerTeamAssignments PlayerTeamAssignment[]
-  coachTeamAssignments CoachTeamAssignment[]
-  clubTeamAssignments ClubTeamAssignment[]
-}
-
-model Competition {
-  id String @id @default(uuid())
-  name String @unique
-
-  editions CompetitionEdition[]
-}
-
-model CompetitionEdition {
-  id String @id @default(uuid())
-
-  competition Competition @relation(fields: [competitionId], references: [id])
-  competitionId String
-
-  season Season @relation(fields: [seasonId], references: [id])
-  seasonId String
-
-  matches Match[]
-  teams Team[]
-  rounds Round[]
-
-  @@unique([competitionId, seasonId])
-}
-
-model Venue {
-  id String @id @default(uuid())
-  name String @unique
-
-  matchAssignments VenueMatchAssignment[]
-}
-
-model VenueMatchAssignment {
-  id String @id @default(uuid())
-
-  venue Venue @relation(fields: [venueId], references: [id])
-  venueId String
-
-  match Match @relation(fields: [matchId], references: [id])
-  matchId String
-}
-
-model Round {
-    id String @id @default(uuid())
-
-    competitionEdition CompetitionEdition @relation(fields: [competitionEditionId], references: [id])
-    competitionEditionId String
-
-    number Int
-    name String?
-
-    type String
-
-    matches Match[]
-
-    @@unique([competitionEditionId, number])
-}
-
-model PlayerPerMatchStatistic {
-    id String @id @default(uuid())
-
-    player Player @relation(fields: [playerId], references: [id])
-    playerId String
-
-    match Match @relation(fields: [matchId], references: [id])
-    matchId String
-
-    type PlayerPerMatchStatisticType @relation(fields: [typeId], references: [id])
-    typeId String
-
-    value Float
-
-    @@unique([playerId, matchId, typeId])
-}
-
-model PlayerPerMatchStatisticType {
-    id String @id @default(uuid())
-    name String @unique
-    description String
-
-    category PlayerPerMatchStatisticCategory @relation(fields: [categoryId], references: [id])
-    categoryId String
-
-    playerStatistics PlayerPerMatchStatistic[]
-}
-
-model PlayerPerMatchStatisticCategory {
-    id String @id @default(uuid())
-    name String @unique
-    description String
-
-    statisticTypes PlayerPerMatchStatisticType[]
 }
 
 model MatchEvent {
@@ -397,3 +355,84 @@ model MatchEventParticipationRole {
 
   participations MatchEventParticipation[]
 }
+
+// MATCH DOMAIN
+
+// COMPETITION DOMAIN
+
+model Competition {
+  id String @id @default(uuid())
+  name String @unique
+
+  editions CompetitionEdition[]
+}
+
+model CompetitionEdition {
+  id String @id @default(uuid())
+
+  competition Competition @relation(fields: [competitionId], references: [id])
+  competitionId String
+
+  season Season @relation(fields: [seasonId], references: [id])
+  seasonId String
+
+  matches Match[]
+  teams Team[]
+  rounds Round[]
+
+  @@unique([competitionId, seasonId])
+}
+
+// COMPETITION DOMAIN
+
+
+// VENUE DOMAIN
+model Venue {
+  id String @id @default(uuid())
+  name String @unique
+
+  matchAssignments VenueMatchAssignment[]
+}
+
+model VenueMatchAssignment {
+  id String @id @default(uuid())
+
+  venue Venue @relation(fields: [venueId], references: [id])
+  venueId String
+
+  match Match @relation(fields: [matchId], references: [id])
+  matchId String
+}
+
+// VENUE DOMAIN
+
+
+// GENERAL DOMAIN
+
+model Season {
+  id String @id @default(uuid())
+  year Int @unique
+
+  editions CompetitionEdition[]
+  playerTeamAssignments PlayerTeamAssignment[]
+  coachTeamAssignments CoachTeamAssignment[]
+  clubTeamAssignments ClubTeamAssignment[]
+}
+
+model Round {
+    id String @id @default(uuid())
+
+    competitionEdition CompetitionEdition @relation(fields: [competitionEditionId], references: [id])
+    competitionEditionId String
+
+    number Int
+    name String?
+
+    type String
+
+    matches Match[]
+
+    @@unique([competitionEditionId, number])
+}
+
+// GENERAL DOMAIN
