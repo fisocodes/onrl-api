@@ -8,7 +8,13 @@ datasource db {
 }
 
 model Profile {
+  @@map("profiles")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   firstName String
   lastName String
 
@@ -19,19 +25,35 @@ model Profile {
 
 // PLAYER DOMAIN
 model Player {
+  @@map("players")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
   
   profile Profile @relation(fields: [profileId], references: [id])
   profileId String @unique
 
+  height Float
+  weight Float
+  dateOfBirth DateTime @map("date_of_birth")
+  birthPlace String @map("birth_place")
+
   teamAssignments PlayerTeamAssignment[]
   lineups Lineup[]
   perMatchStatistics PlayerPerMatchStatistic[]
-  matchEventParticipations MatchEventParticipation[]
+  participationsInMatchEvents PlayerParticipationInMatchEvent[]
 }
 
-model PlayerPosition {
+model PlayerTacticalPosition {
+  @@map("player_tactical_positions")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   name String @unique
   description String
 
@@ -40,57 +62,79 @@ model PlayerPosition {
 }
 
 model PlayerTeamAssignment {
+  @@map("player_team_assignments")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   player Player @relation(fields: [playerId], references: [id])
-  playerId String
+  playerId String @map("player_id")
 
   team Team @relation(fields: [teamId], references: [id])
-  teamId String
+  teamId String @map("team_id")
 
-  playerPosition PlayerPosition @relation(fields: [playerPositionId], references: [id])
-  playerPositionId String
+  position PlayerTacticalPosition @relation(fields: [positionId], references: [id])
+  positionId String @map("position_id")
 
   season Season @relation(fields: [seasonId], references: [id])
-  seasonId String
+  seasonId String @map("season_id")
 
   @@unique([playerId, seasonId])
 }
 
 model PlayerPerMatchStatistic {
-    id String @id @default(uuid())
+  @@map("player_per_match_statistics")
 
-    player Player @relation(fields: [playerId], references: [id])
-    playerId String
+  id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-    match Match @relation(fields: [matchId], references: [id])
-    matchId String
+  player Player @relation(fields: [playerId], references: [id])
+  playerId String @map("player_id")
 
-    type PlayerPerMatchStatisticType @relation(fields: [typeId], references: [id])
-    typeId String
+  match Match @relation(fields: [matchId], references: [id])
+  matchId String @map("match_id")
 
-    value Float
+  type PlayerPerMatchStatisticType @relation(fields: [typeId], references: [id])
+  typeId String @map("type_id")
 
-    @@unique([playerId, matchId, typeId])
+  value Float
+
+  @@unique([playerId, matchId, typeId])
 }
 
 model PlayerPerMatchStatisticType {
-    id String @id @default(uuid())
-    name String @unique
-    description String
+  @@map("player_per_match_statistic_types")
 
-    category PlayerPerMatchStatisticCategory @relation(fields: [categoryId], references: [id])
-    categoryId String
+  id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-    playerStatistics PlayerPerMatchStatistic[]
+  name String @unique
+  description String
+
+  category PlayerPerMatchStatisticCategory @relation(fields: [categoryId], references: [id])
+  categoryId String @map("category_id")
+
+  statistics PlayerPerMatchStatistic[]
 }
 
 model PlayerPerMatchStatisticCategory {
-    id String @id @default(uuid())
-    name String @unique
-    description String
+  @@map("player_per_match_statistic_categories")
 
-    statisticTypes PlayerPerMatchStatisticType[]
+  id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+    
+  name String @unique
+  description String
+
+  types PlayerPerMatchStatisticType[]
 }
 
 // PLAYER DOMAIN
@@ -99,25 +143,35 @@ model PlayerPerMatchStatisticCategory {
 // COACH DOMAIN
 
 model Coach {
+  @@map("coaches")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   profile Profile @relation(fields: [profileId], references: [id])
-  profileId String @unique
+  profileId String @unique @map("profile_id")
 
   teamAssignments CoachTeamAssignment[]
 }
 
 model CoachTeamAssignment {
+  @@map("coach_assignments_to_teams")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   coach Coach @relation(fields: [coachId], references: [id])
-  coachId String
+  coachId String @map("coach_id")
 
   team Team @relation(fields: [teamId], references: [id])
-  teamId String
+  teamId String @map("team_id")
 
   season Season @relation(fields: [seasonId], references: [id])
-  seasonId String
+  seasonId String @map("season_id")
 
   @@unique([coachId, seasonId, teamId])
 }
@@ -128,16 +182,27 @@ model CoachTeamAssignment {
 // REFEREE DOMAIN
 
 model Official {
+  @@map("officials")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   profile Profile @relation(fields: [profileId], references: [id])
-  profileId String @unique
+  profileId String @unique @map("profile_id")
 
   assignments RefereeCrewAssignment[]
 }
 
 model OfficialRole {
+  @@map("official_roles")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   name String @unique
   description String
 
@@ -145,22 +210,32 @@ model OfficialRole {
 }
 
 model RefereeCrew {
+  @@map("referee_crews")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   assignments RefereeCrewAssignment[]
   matches Match[]
 }
 model RefereeCrewAssignment {
+  @@map("referee_crew_assignments")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   official Official @relation(fields: [officialId], references: [id])
-  officialId String
+  officialId String @map("official_id")
 
   role OfficialRole @relation(fields: [roleId], references: [id])
-  roleId String
+  roleId String @map("role_id")
 
   refereeCrew RefereeCrew @relation(fields: [refereeCrewId], references: [id])
-  refereeCrewId String
+  refereeCrewId String @map("referee_crew_id")
 }
 
 // REFEREE DOMAIN
@@ -169,7 +244,12 @@ model RefereeCrewAssignment {
 //CLUB DOMAIN
 
 model Club {
+  @@map("clubs")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   name String @unique
 
@@ -177,16 +257,21 @@ model Club {
 }
 
 model ClubTeamAssignment {
+  @@map("club_team_assignments")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   club Club @relation(fields: [clubId], references: [id])
-  clubId String
+  clubId String @map("club_id")
 
   team Team @relation(fields: [teamId], references: [id])
-  teamId String
+  teamId String @map("team_id")
 
   season Season @relation(fields: [seasonId], references: [id])
-  seasonId String
+  seasonId String @map("season_id")
 
   @@unique([seasonId, teamId])
 }
@@ -197,10 +282,15 @@ model ClubTeamAssignment {
 // TEAM DOMAIN
 
 model Team {
+  @@map("teams")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   competitionEdition CompetitionEdition @relation(fields: [competitionEditionId], references: [id])
-  competitionEditionId String
+  competitionEditionId String @map("competition_edition_id")
 
   clubAssignments ClubTeamAssignment[]
   coachAssignments CoachTeamAssignment[]
@@ -211,18 +301,23 @@ model Team {
 }
 
 model Lineup {
+  @@map("lineups")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   teamMatchAppearance TeamMatchAppearance @relation(fields: [teamMatchAppearanceId], references: [id])
-  teamMatchAppearanceId String
+  teamMatchAppearanceId String @map("team_match_appearance_id")
 
   player Player @relation(fields: [playerId], references: [id])
-  playerId String
+  playerId String @map("player_id")
 
-  position PlayerPosition @relation(fields: [positionId], references: [id])
-  positionId String
+  position PlayerTacticalPosition @relation(fields: [positionId], references: [id])
+  positionId String @map("role_id")
 
-  jerseyNumber Int
+  jerseyNumber Int @map("jersey_number")
 
   @@index([teamMatchAppearanceId, jerseyNumber])
 
@@ -230,30 +325,40 @@ model Lineup {
 }
 
 model TeamMatchAppearance {
-  id String @id @default(uuid())
+  @@map("team_match_appearances")
 
-  isHome Boolean
+  id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  isHome Boolean @map("is_home")
 
   match Match @relation(fields: [matchId], references: [id])
-  matchId String
+  matchId String @map("match_id")
 
   team Team @relation(fields: [teamId], references: [id])
-  teamId String
+  teamId String @map("team_id")
 
   lineup Lineup[]
 }
 
 model TeamPerMatchStatistic {
+  @@map("team_per_match_statistics")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   team Team @relation(fields: [teamId], references: [id])
-  teamId String
+  teamId String @map("team_id")
 
   match Match @relation(fields: [matchId], references: [id])
-  matchId String
+  matchId String @map("match_id")
 
   type TeamPerMatchStatisticType @relation(fields: [typeId], references: [id])
-  typeId String
+  typeId String @map("type_id")
 
   value Float
 
@@ -261,42 +366,57 @@ model TeamPerMatchStatistic {
 }
 
 model TeamPerMatchStatisticType {
+  @@map("team_per_match_statistic_types")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   name String @unique
   description String
 
   category TeamPerMatchStatisticCategory @relation(fields: [categoryId], references: [id])
-  categoryId String
+  categoryId String @map("category_id")
 
-  teamStatistics TeamPerMatchStatistic[]
+  statistics TeamPerMatchStatistic[]
 }
 
 model TeamPerMatchStatisticCategory {
+  @@map("team_per_match_statistic_categories")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   name String @unique
   description String
 
-  statisticTypes TeamPerMatchStatisticType[]
+  types TeamPerMatchStatisticType[]
 }
 
 // TEAM DOMAIN
 
 //MATCH DOMAIN
 model Match {
+  @@map("matches")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   venueAssignments VenueMatchAssignment[]
 
   competitionEdition CompetitionEdition @relation(fields: [competitionEditionId], references: [id])
-  competitionEditionId String
+  competitionEditionId String @map("competition_edition_id")
 
   round Round @relation(fields: [roundId], references: [id])
-  roundId String
+  roundId String @map("round_id")
 
   refereeCrew RefereeCrew @relation(fields: [refereeCrewId], references: [id])
-  refereeCrewId String
+  refereeCrewId String @map("referee_crew_id")
 
   teamAppearances TeamMatchAppearance[]
   teamStatistics TeamPerMatchStatistic[]
@@ -306,54 +426,75 @@ model Match {
 }
 
 model MatchEvent {
-    id String @id @default(uuid())
+  @@map("match_events")
+
+  id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
     
-    match Match @relation(fields: [matchId], references: [id])
-    matchId String
+  match Match @relation(fields: [matchId], references: [id])
+  matchId String @map("match_id")
 
-    team Team @relation(fields: [teamId], references: [id])
-    teamId String
+  team Team @relation(fields: [teamId], references: [id])
+  teamId String @map("team_id")
 
-    participations MatchEventParticipation[]
+  participations PlayerParticipationInMatchEvent[]
 
-    timestamp Int
+  timestamp Int
 
-    type MatchEventType @relation(fields: [typeId], references: [id])
-    typeId String
+  type MatchEventType @relation(fields: [typeId], references: [id])
+  typeId String @map("type_id")
 
-    @@index([matchId, timestamp])
+  @@index([matchId, timestamp])
 }
 
 model MatchEventType {
-    id String @id @default(uuid())
+  @@map("match_event_type")
 
-    name String @unique
-    description String
+  id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-    events MatchEvent[]
+  name String @unique
+  description String
+
+  events MatchEvent[]
 }
 
-model MatchEventParticipation {
+model PlayerParticipationInMatchEvent {
+  @@map("match_event_participation")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   event MatchEvent @relation(fields: [eventId], references: [id])
-  eventId String
+  eventId String @map("event_id")
 
   player Player @relation(fields: [playerId], references: [id])
-  playerId String
+  playerId String @map("player_id")
 
   role MatchEventParticipationRole @relation(fields: [roleId], references: [id])
-  roleId String
+  roleId String @map("role_id")
 
   @@unique([eventId, playerId])
 }
 
 model MatchEventParticipationRole {
+  @@map("match_event_participation_roles")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   name String @unique
   description String
 
-  participations MatchEventParticipation[]
+  participations PlayerParticipationInMatchEvent[]
 }
 
 // MATCH DOMAIN
@@ -361,14 +502,25 @@ model MatchEventParticipationRole {
 // COMPETITION DOMAIN
 
 model Competition {
+  @@map("competitions")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   name String @unique
 
   editions CompetitionEdition[]
 }
 
 model CompetitionEdition {
+  @@map("competition_editions")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   competition Competition @relation(fields: [competitionId], references: [id])
   competitionId String
@@ -388,14 +540,25 @@ model CompetitionEdition {
 
 // VENUE DOMAIN
 model Venue {
+  @@map("venues")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   name String @unique
 
   matchAssignments VenueMatchAssignment[]
 }
 
 model VenueMatchAssignment {
+  @@map("venue_match_assignments")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   venue Venue @relation(fields: [venueId], references: [id])
   venueId String
@@ -410,7 +573,13 @@ model VenueMatchAssignment {
 // GENERAL DOMAIN
 
 model Season {
+  @@map("seasons")
+
   id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   year Int @unique
 
   editions CompetitionEdition[]
@@ -420,19 +589,24 @@ model Season {
 }
 
 model Round {
-    id String @id @default(uuid())
+  @@map("rounds")
 
-    competitionEdition CompetitionEdition @relation(fields: [competitionEditionId], references: [id])
-    competitionEditionId String
+  id String @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-    number Int
-    name String?
+  competitionEdition CompetitionEdition @relation(fields: [competitionEditionId], references: [id])
+  competitionEditionId String
 
-    type String
+  number Int
+  name String?
 
-    matches Match[]
+  type String
 
-    @@unique([competitionEditionId, number])
+  matches Match[]
+
+  @@unique([competitionEditionId, number])
 }
 
 // GENERAL DOMAIN
