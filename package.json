@@ -48,5 +48,6 @@
 		"@nestjs/platform-express": "10.4.15",
 		"@prisma/client": "6.1.0",
 		"reflect-metadata": "0.2.2"
-	}
+	},
+	"packageManager": "yarn@4.9.2"
 }
