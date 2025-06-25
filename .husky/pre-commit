@@ -1,1 +1,2 @@
-npm test
+yarn test
+npx ts-standard
